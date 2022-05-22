@@ -1,0 +1,25 @@
+.app {
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  background-color: #dadbd3;
+}
+.app__body {
+  display: flex;
+  background-color: #ededed;
+  margin-top: -50px;
+  height: 90vh;
+  width: 90vw;
+  box-shadow: -1px 4px 20px -6px rgba(0, 0, 0, 0.75);
+}
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: #ededed; /* color of the tracking area */
+}
+::-webkit-scrollbar-thumb {
+  background-color: gray; /* color of the scroll thumb */
+  border-radius: 20px; /* roundness of the scroll thumb */
+  border: 3px solid #ededed; /* creates padding around scroll thumb */
+}
