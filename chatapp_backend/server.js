@@ -1,6 +1,7 @@
 //imporing
 import express from "express";
 import mongoose from "mongoose";
+import Rooms from "./dbRooms.js";
 import Messages from "./dbMessages.js";
 import Pusher from "pusher";
 import cors from "cors";
@@ -37,7 +38,25 @@ mongoose.connect(conection_url, (err) => {
 const db = mongoose.connection;
 
 db.once("open", () => {
-  console.log("DB Connected");
+  console.log("rooms DB Connected");
+  const roomCollection = db.collection("rooms");
+  const changeStream = roomCollection.watch();
+  changeStream.on("change", (change) => {
+    console.log(change);
+
+    if (change.operationType == "insert") {
+      const roomDetail = change.fullDocument;
+      pusher.trigger("rooms", "inserted", {
+        name: roomDetail.name,
+      });
+    } else {
+      console.log("error triggering Pusher");
+    }
+  });
+});
+
+db.once("open", () => {
+  console.log("message DB Connected");
   const msgCollection = db.collection("messagecontents");
   const changeStream = msgCollection.watch();
   changeStream.on("change", (change) => {
@@ -48,8 +67,9 @@ db.once("open", () => {
       pusher.trigger("messages", "inserted", {
         name: messageDetails.name,
         message: messageDetails.message,
+        roomId: messageDetails.roomId,
+        email: messageDetails.email,
         timestamp: messageDetails.timestamp,
-        received: messageDetails.received,
       });
     } else {
       console.log("error triggering Pusher");
@@ -69,11 +89,31 @@ app.get("/messages/sync", (req, res) => {
     }
   });
 });
+app.get("/rooms/sync", (req, res) => {
+  Rooms.find((err, data) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.status(200).send(data);
+    }
+  });
+});
 
 app.post("/messages/new", (req, res) => {
   const dbMessage = req.body;
 
   Messages.create(dbMessage, (err, data) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.status(201).send(data);
+    }
+  });
+});
+app.post("/rooms/new", (req, res) => {
+  const dbRooms = req.body;
+
+  Messages.create(dbRooms, (err, data) => {
     if (err) {
       res.status(500).send(err);
     } else {

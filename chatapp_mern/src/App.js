@@ -6,37 +6,41 @@ import { useEffect, useState } from "react";
 import Pusher from "pusher-js";
 import axios from "./Axios";
 import { useStateValue } from "./StateProvider";
+import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
+// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// import { Switch } from "react-router-dom";
 
 function App() {
   const [messages, setMessages] = useState([]);
+  const { roomId } = useParams();
+  // fetch initial  data
+  const [rooms, setRooms] = useState([]);
 
-  // const [rooms, setRooms] = useState([]);
-  // useEffect(() => {
-  //   axios.get("/messages/sync").then((respose) => {
-  //     setRooms(respose.data);
-  //   });
-  // }, []);
+  useEffect(() => {
+    axios.get("/rooms/sync").then((respose) => {
+      setRooms(respose.data);
+    });
+  }, []);
 
-  // useEffect(() => {
-  //   const pusher = new Pusher("14878ebb629ff55b4658", {
-  //     cluster: "ap2",
-  //   });
-  //   const channel = pusher.subscribe("rooms");
-  //   channel.bind("inserted", function (newRooms) {
-  //     // alert(JSON.stringify(newMessage));
-  //     //append new message to the current messages
-  //     setRooms([...rooms, newRooms]);
-  //   });
+  useEffect(() => {
+    const pusher = new Pusher("14878ebb629ff55b4658", {
+      cluster: "ap2",
+    });
+    const channel = pusher.subscribe("rooms");
+    channel.bind("inserted", function (newRooms) {
+      // alert(JSON.stringify(newMessage));
+      //append new message to the current messages
+      setRooms([...rooms, newRooms]);
+    });
 
-  //   return () => {
-  //     channel.unbind_all();
-  //     channel.unsubscribe();
-  //   };
-  // }, [rooms]);
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+  }, [rooms]);
 
   // console.log(rooms);
 
-  // fetch initial  data
   useEffect(() => {
     axios.get("/messages/sync").then((respose) => {
       setMessages(respose.data);
@@ -60,7 +64,7 @@ function App() {
     };
   }, [messages]);
 
-  console.log(messages);
+  // console.log(messages);
 
   // show login screen if no user is connected
   // const [user, setUser] = useState(null);
@@ -74,11 +78,43 @@ function App() {
         <Login />
       ) : (
         <div className="app__body">
-          <Sidebar />
-          <Chat messages={messages} />
-          {/* <Chat /> */}
+          <BrowserRouter>
+            <Sidebar rooms={rooms} />
+            <Routes>
+              <Route
+                path="/rooms/:roomId"
+                element={
+                  <>
+                    <Chat rooms={rooms} messages={messages} />
+                  </>
+                }
+              />
+              <Route
+                path="/"
+                element={<Chat rooms={rooms} messages={messages} />}
+              />
+            </Routes>
+          </BrowserRouter>
         </div>
       )}
+
+      {/* {!user ? (
+        <Login />
+      ) : (
+        <div className="app__body">
+          <Router>
+            <Routes>
+              <Route path="/app">
+                <Sidebar rooms={rooms} />
+                <Chat messages={messages} />
+              </Route>
+              <Route path="/">
+                <h1>Home screen</h1>
+              </Route>
+            </Routes>
+          </Router>
+        </div>
+      )} */}
     </div>
   );
 }

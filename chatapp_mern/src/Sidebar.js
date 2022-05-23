@@ -6,15 +6,13 @@ import ChatIcon from "@material-ui/icons/Chat";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { SearchOutlined } from "@material-ui/icons";
 import SidebarChat from "./SidebarChat";
+import Pusher from "pusher-js";
 import axios from "./Axios";
 import { useStateValue } from "./StateProvider";
 
-function Sidebar() {
+function Sidebar({ rooms }) {
   //datalayer fetch
   const [{ user }, dispatch] = useStateValue();
-  const [rooms, setRooms] = useState([]);
-  useEffect(() => {}, []);
-
   return (
     <div className="sidebar">
       {/* <h1>Sidebar</h1> */}
@@ -41,15 +39,13 @@ function Sidebar() {
       </div>
       <div className="sidebar_chats">
         <SidebarChat addNewChat />
-        <SidebarChat />
-        <SidebarChat />
-        <SidebarChat />
-        <SidebarChat />
-        <SidebarChat />
-        <SidebarChat />
-        <SidebarChat />
-        <SidebarChat />
-        <SidebarChat />
+        {rooms.map((rooms) => (
+          <p>
+            <SidebarChat key={rooms._id} roomName={rooms.name} id={rooms._id} />
+          </p>
+        ))}
+        {/* <SidebarChat /> */}
+        {/* <SidebarChat rooms={rooms}/> */}
       </div>
     </div>
   );

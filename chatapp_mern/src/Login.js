@@ -17,6 +17,7 @@ function Login() {
   const SignIn = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
+        console.log(result);
         dispatch({
           type: actionTypes.SET_USER,
           user: result.user,
@@ -51,6 +52,7 @@ function Login() {
       });
       */
   };
+
   return (
     <div className="login">
       <div className="login__container">

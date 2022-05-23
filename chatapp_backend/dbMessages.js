@@ -1,18 +1,18 @@
 import mongoose from "mongoose";
 
 //create schema for database
-
 const chatappSchema = mongoose.Schema({
   message: String,
+  roomId: String,
   name: String,
+  email: String,
   timestamp: String,
-  received: Boolean,
+  // roomID: Array,
+  // sender: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "User",
+  //   required: true,
+  // },
+  //  timestamps: true,
 });
-
 export default mongoose.model("messagecontents", chatappSchema);
-
-// const chatappSchema = mongoose.Schema({
-//   name: String,
-// });
-
-// export default mongoose.model("rooms", chatappSchema);
