@@ -7,7 +7,7 @@ import Pusher from "pusher";
 import cors from "cors";
 //app config
 const app = express();
-const port = process.env.port || 9000;
+const port = process.env.PORT || 9000;
 const pusher = new Pusher({
   appId: "1412337",
   key: "14878ebb629ff55b4658",
@@ -27,8 +27,8 @@ app.use(cors());
 // });
 
 //DBconfig
-const conection_url =
-  "mongodb+srv://admin:pByDWj9dcCVnJwPj@cluster0.ijbqq.mongodb.net/chatappdb?retryWrites=true&w=majority";
+const conection_url = process.env.DATABASE;
+// "mongodb+srv://admin:pByDWj9dcCVnJwPj@cluster0.ijbqq.mongodb.net/chatappdb?retryWrites=true&w=majority";
 mongoose.connect(conection_url, (err) => {
   if (err) throw err;
   // console.log('connected to MongoDB')
@@ -78,7 +78,7 @@ db.once("open", () => {
 });
 
 //api routes
-app.get("/", (req, res) => res.status(200).send("hello world"));
+// app.get("/", (req, res) => res.status(200).send("hello world"));
 
 app.get("/messages/sync", (req, res) => {
   Messages.find((err, data) => {
@@ -122,5 +122,9 @@ app.post("/rooms/new", (req, res) => {
   });
 });
 
+//step 3 deploy
+if ((process.env.NODE_ENV = "production")) {
+  app.use(express.static("chatapp_mern/build"));
+}
 //listener
 app.listen(port, () => console.log(`Listening on Localhost :${port}`));
