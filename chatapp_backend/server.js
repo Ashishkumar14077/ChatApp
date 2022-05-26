@@ -113,7 +113,7 @@ app.post("/messages/new", (req, res) => {
 app.post("/rooms/new", (req, res) => {
   const dbRooms = req.body;
 
-  Messages.create(dbRooms, (err, data) => {
+  Rooms.create(dbRooms, (err, data) => {
     if (err) {
       res.status(500).send(err);
     } else {
